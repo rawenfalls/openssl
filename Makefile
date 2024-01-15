@@ -1,12 +1,15 @@
 CC=gcc
 FLAGS=-lssl -lcrypto
-RENAME=-o chek
+NAME=check
+RENAME=-o check
+START = ./$(NAME)
+FILES = main.c
 
 all:
-	@$(CC) main.c $(FLAGS) $(RENAME) && ./chek 
+	@$(CC) $(FILES) $(FLAGS) $(RENAME) && $(START)
 	$(info DONE)
 clean:
-	@rm -rf chek
+	@rm -rf $(NAME)
 	$(info DONE)
 leaks:
-	@$(CC) main.c $(FLAGS) $(RENAME) && valgrind ./chek
+	@$(CC) $(FILES) $(FLAGS) $(RENAME) && valgrind $(START)

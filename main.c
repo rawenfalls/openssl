@@ -63,8 +63,8 @@ char* read_from_file(const char *path){
 }
 
 int main() {
-    const char *message = "readme.txt";//к файлу
-    const char *signature = "readme.signature";//путь к подписи
+    const char *message = "for_check/readme.txt";//к файлу
+    const char *signature = "signature/readme.signature";//путь к подписи
     const char *public_key_path = "key/publickey";//путь к публичному ключу
 
     char *message_s = read_from_file(message);
