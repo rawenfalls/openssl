@@ -13,3 +13,5 @@ clean:
 	$(info DONE)
 leaks:
 	@$(CC) $(FILES) $(FLAGS) $(RENAME) && valgrind $(START)
+add:
+	git add . && git status
