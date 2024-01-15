@@ -51,7 +51,7 @@ char* read_from_file(const char *path){
     long file_size = ftell(file);
     fseek(file, 0, SEEK_SET);
     char *file_content = (char *)malloc(file_size + 1);
-        if (!file_content) {
+    if (!file_content) {
         fclose(file);
         perror("Error allocating memory");
         return "";
@@ -67,23 +67,23 @@ int main() {
     const char *signature = "signature/readme.signature";//путь к подписи
     const char *public_key_path = "key/publickey";//путь к публичному ключу
 
-    char *message_s = read_from_file(message);
-    char *signature_s = read_from_file(signature);
-
-    
-
-
+    char *message_s = read_from_file(message);//чтение из файла
+    char *signature_s = read_from_file(signature);//чтение из файла
+    if (message_s == "" || signature_s == "") return 1;
 
     int result = verify_signature(message_s, signature_s, public_key_path);
+    free(message_s);
+    free(signature_s);
 
     if (result == 1) {
         printf("Signature is valid!\n");
+        return 0;
     } else if (result == 0) {
         printf("Signature is invalid.\n");
+        return 1;
     } else {
         perror("Error verifying signature");
+        return 1;
     }
-    free(message_s);
-    free(signature_s);
     return 0;
 }
