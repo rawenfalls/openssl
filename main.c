@@ -136,7 +136,7 @@ void read_and_edit_file(const char *source_path, long delete_len, const char *si
 int main() {
     //объявление путей к файлам
     //const char *message = "for_check/readme.txt";//к файлу
-    //const char *signature = "signature/readme.signature";//путь к подписи
+    const char *signature = "signature/readme.signature";//путь к подписи
     const char *public_key_path = "key/publickey";//путь к публичному ключу
     const char *ima_path = "a.ima";
     const char *signature_path = "signature/signature";

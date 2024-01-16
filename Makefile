@@ -22,23 +22,28 @@ leaks:
 add:
 	@git add . && git status
 
-$(TARGET): privatekey signature publickey check
+$(TARGET): privatekey signature publickey check count
 
 privatekey:
 	@openssl genrsa -out key/privatekey 2048
 
 signature:
-	@openssl dgst -sha256 -sign key/privatekey -out signature/readme.signature for_check/readme.txt
+	@openssl dgst -sha256 -sign key/privatekey -out signature/readme.signature a.ima
 
 publickey:
 	@openssl rsa -in key/privatekey -outform PEM -pubout -out key/publickey
 
 check:
-	@openssl dgst -sha256 -verify key/publickey -signature signature/readme.signature for_check/readme.txt
+	@openssl dgst -sha256 -verify key/publickey -signature signature/readme.signature a.ima
 
 merge:
 	@./merge_files.sh -q signature/readme.signature a.ima
 ima:
-	@echo "a.ima" > a.ima && ./merge_files.sh -q signature/readme.signature a.ima
+	@echo "a.ima" > a.ima
+imam:
+	@./merge_files.sh -q signature/readme.signature a.ima	
 ima2:
 	@echo echo -n "" > b.ima
+
+count:
+	@./count_chars.sh -q signature/readme.signature
