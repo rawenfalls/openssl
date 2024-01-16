@@ -16,7 +16,7 @@ void error(char *msg) {
     exit(EXIT_FAILURE);
 }
 
-int verify_signature(const char *message, const char *signature, size_t *signature_len, const char *public_key_path) {
+int verify_signature(const char *message, unsigned int message_len, const char *signature, unsigned int signature_len, const char *public_key_path) {
     FILE *key_file = fopen(public_key_path, "r");
     if (!key_file) {
         perror("Error opening public key file");
@@ -44,7 +44,7 @@ int verify_signature(const char *message, const char *signature, size_t *signatu
         return -1;
     }
 
-    int result = EVP_VerifyFinal(md_ctx, (const unsigned char *)signature, *signature_len, public_key);
+    int result = EVP_VerifyFinal(md_ctx, (const unsigned char *)signature, signature_len, public_key);
 
     EVP_MD_CTX_free(md_ctx);
     EVP_PKEY_free(public_key);
@@ -52,8 +52,8 @@ int verify_signature(const char *message, const char *signature, size_t *signatu
     return result;
 }
 
-char* read_file(const char *path){
-        FILE *file = fopen(path, "r");
+char* read_file(const char *path, size_t *ima_len){
+        FILE *file = fopen(path, "rb");
     if (!file) {
         error("Error opening file");
     }
@@ -65,7 +65,7 @@ char* read_file(const char *path){
         fclose(file);
         error("Error allocating memory");
     }
-    fread(file_content, 1, file_size, file);
+    *ima_len = fread(file_content, 1, file_size, file);
     fclose(file);
     file_content[file_size] = '\0';
     return(file_content);
@@ -94,7 +94,7 @@ char* read_signature(const char *path, size_t *signature_len){
 
 void read_and_edit_file(const char *source_path, long delete_len, const char *signature_path){
     //открытие файла для чтения и записи
-    FILE *source = fopen(source_path, "r");
+    FILE *source = fopen(source_path, "rb");
     if (source == NULL) {
         error("Не удалось открыть файл для чтения");
     }
@@ -117,7 +117,7 @@ void read_and_edit_file(const char *source_path, long delete_len, const char *si
     fclose(source);
 
     //открытие файла для записи
-    source = fopen(source_path, "w");
+    source = fopen(source_path, "wb");
     if (source == NULL) {
         error("Не удалось открыть файл для записи");
     }
@@ -135,7 +135,7 @@ void read_and_edit_file(const char *source_path, long delete_len, const char *si
     fclose(source);
 
     //создание файла куда будут записанны оставшиеся символы
-    source = fopen(signature_path, "w");
+    source = fopen(signature_path, "wb");
     if (source == NULL) {
         error("Не удалось открыть файл для записи");
     }
@@ -160,21 +160,23 @@ int main() {
     //const char *message = "for_check/readme.txt";//к файлу
     //const char *signature = "signature/readme.signature";//путь к подписи
     const char *public_key_path = "key/publickey";//путь к публичному ключу
-    const char *ima_path = "a.ima";//путь к *.ima файлу
+    const char *ima_path = "ts3000.ima";//путь к *.ima файлу
     const char *signature_path = "signature/signature";//путь к подписи
     size_t signature_len;//длинна подписи отпредлеляется в read_signature()
+    size_t ima_len;//длинна подписи отпредлеляется в read_signature()
 
     read_and_edit_file(ima_path, 256, signature_path);//убераем подпись из файла *.ima,
     //создаем новый файл с путем signature_path куда записываем новую подпись
-    char *imaS = read_file(ima_path);//чтение из *ima файла
+    char *imaS = read_file(ima_path, &ima_len);//чтение из *ima файла
     char *signatureS = read_signature(signature_path, &signature_len);//чтение подписи из файла и определение ее длинны
 
     // for(int i =0; i<256; i++){//печать подписи
     //     write(1,&signatureS[i],1);
     // }
-
+    //printf("%zu\n",signature_len);
     //файл для проверки messageS, подпись signatureS, путь до публичного ключа
-    int result = verify_signature(imaS, signatureS, &signature_len, public_key_path);
+    //printf("%zu",ima_len);
+    int result = verify_signature(imaS, (unsigned int)ima_len, signatureS, (unsigned int)signature_len, public_key_path);
 
     //освобождаем память которая выделялась в функции read_from_file()
     free(imaS);
