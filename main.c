@@ -158,29 +158,29 @@ void read_and_edit_file(const char *source_path, long delete_len, const char *si
 int main() {
     //объявление путей к файлам
     //const char *message = "for_check/readme.txt";//к файлу
-    const char *signature = "signature/readme.signature";//путь к подписи
+    //const char *signature = "signature/readme.signature";//путь к подписи
     const char *public_key_path = "key/publickey";//путь к публичному ключу
-    const char *ima_path = "a.ima";
-    const char *signature_path = "signature/signature";
-    size_t signature_len;
+    const char *ima_path = "a.ima";//путь к *.ima файлу
+    const char *signature_path = "signature/signature";//путь к подписи
+    size_t signature_len;//длинна подписи отпредлеляется в read_signature()
 
-    //read_and_edit_file(ima_path, 256, signature_path);//убераем подпись из файла *.ima,
+    read_and_edit_file(ima_path, 256, signature_path);//убераем подпись из файла *.ima,
     //создаем новый файл с путем signature_path куда записываем новую подпись
-    char *messageS = read_file(ima_path);//чтение из *ima файла
-    char *signatureS = read_signature(signature_path, &signature_len);//чтение подписи из файла
+    char *imaS = read_file(ima_path);//чтение из *ima файла
+    char *signatureS = read_signature(signature_path, &signature_len);//чтение подписи из файла и определение ее длинны
 
-    //printf("%s\n%s\n", messageS, signatureS);
-    for(int i =0; i<256; i++){
-        write(1,&signatureS[i],1);
-    }
+    // for(int i =0; i<256; i++){//печать подписи
+    //     write(1,&signatureS[i],1);
+    // }
 
     //файл для проверки messageS, подпись signatureS, путь до публичного ключа
-    int result = verify_signature(messageS, signatureS, &signature_len, public_key_path);
+    int result = verify_signature(imaS, signatureS, &signature_len, public_key_path);
 
     //освобождаем память которая выделялась в функции read_from_file()
-    free(messageS);
+    free(imaS);
     free(signatureS);
 
+    //вывод
     if (result == 1) {
         printf(GREEN_TEXT "Signature is valid!\n" RESET_COLOR);
         return 0;
