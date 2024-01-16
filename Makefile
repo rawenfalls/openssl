@@ -25,13 +25,18 @@ add:
 $(TARGET): privatekey signature publickey check
 
 privatekey:
-	openssl genrsa -out key/privatekey 2048
+	@openssl genrsa -out key/privatekey 2048
 
 signature:
-	openssl dgst -sha256 -sign key/privatekey -out signature/readme.signature for_check/readme.txt
+	@openssl dgst -sha256 -sign key/privatekey -out signature/readme.signature for_check/readme.txt
 
 publickey:
-	openssl rsa -in key/privatekey -outform PEM -pubout -out key/publickey
+	@openssl rsa -in key/privatekey -outform PEM -pubout -out key/publickey
 
 check:
-	openssl dgst -sha256 -verify key/publickey -signature signature/readme.signature for_check/readme.txt
+	@openssl dgst -sha256 -verify key/publickey -signature signature/readme.signature for_check/readme.txt
+
+merge:
+	@./merge_files.sh -q signature/readme.signature a.ima
+ima:
+	@echo "a.ima" > a.ima
