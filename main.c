@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <openssl/evp.h>
 #include <openssl/pem.h>
 #include <openssl/err.h>
@@ -15,7 +16,7 @@ void error(char *msg) {
     exit(EXIT_FAILURE);
 }
 
-int verify_signature(const char *message, const char *signature, const char *public_key_path) {
+int verify_signature(const char *message, const char *signature, size_t *signature_len, const char *public_key_path) {
     FILE *key_file = fopen(public_key_path, "r");
     if (!key_file) {
         perror("Error opening public key file");
@@ -43,7 +44,7 @@ int verify_signature(const char *message, const char *signature, const char *pub
         return -1;
     }
 
-    int result = EVP_VerifyFinal(md_ctx, (const unsigned char *)signature, strlen(signature), public_key);
+    int result = EVP_VerifyFinal(md_ctx, (const unsigned char *)signature, *signature_len, public_key);
 
     EVP_MD_CTX_free(md_ctx);
     EVP_PKEY_free(public_key);
@@ -51,7 +52,7 @@ int verify_signature(const char *message, const char *signature, const char *pub
     return result;
 }
 
-char* read_from_file(const char *path){
+char* read_file(const char *path){
         FILE *file = fopen(path, "r");
     if (!file) {
         error("Error opening file");
@@ -65,6 +66,27 @@ char* read_from_file(const char *path){
         error("Error allocating memory");
     }
     fread(file_content, 1, file_size, file);
+    fclose(file);
+    file_content[file_size] = '\0';
+    return(file_content);
+}
+
+char* read_signature(const char *path, size_t *signature_len){
+    FILE *file = fopen(path, "rb");
+    if (!file) {
+        error("Error opening file");
+    }
+    fseek(file, 0, SEEK_END);
+    long file_size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+    char *file_content = (char *)malloc(file_size + 1);
+    if (!file_content) {
+        fclose(file);
+        error("Error allocating memory");
+    }
+    // fread(file_content, 1, file_size, file);
+    *signature_len = fread(file_content, 1, file_size, file);
+    // printf("%zu\n",read_bytes);
     fclose(file);
     file_content[file_size] = '\0';
     return(file_content);
@@ -140,14 +162,20 @@ int main() {
     const char *public_key_path = "key/publickey";//путь к публичному ключу
     const char *ima_path = "a.ima";
     const char *signature_path = "signature/signature";
+    size_t signature_len;
 
-    read_and_edit_file(ima_path, 256, signature_path);//убераем подпись из файла *.ima,
+    //read_and_edit_file(ima_path, 256, signature_path);//убераем подпись из файла *.ima,
     //создаем новый файл с путем signature_path куда записываем новую подпись
-    char *messageS = read_from_file(ima_path);//чтение из *ima файла
-    char *signatureS = read_from_file(signature_path);//чтение подписи из файла
+    char *messageS = read_file(ima_path);//чтение из *ima файла
+    char *signatureS = read_signature(signature_path, &signature_len);//чтение подписи из файла
+
+    //printf("%s\n%s\n", messageS, signatureS);
+    for(int i =0; i<256; i++){
+        write(1,&signatureS[i],1);
+    }
 
     //файл для проверки messageS, подпись signatureS, путь до публичного ключа
-    int result = verify_signature(messageS, signatureS, public_key_path);
+    int result = verify_signature(messageS, signatureS, &signature_len, public_key_path);
 
     //освобождаем память которая выделялась в функции read_from_file()
     free(messageS);
