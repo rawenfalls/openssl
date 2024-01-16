@@ -22,7 +22,7 @@ leaks:
 add:
 	@git add . && git status
 
-$(TARGET): privatekey signature publickey check 
+$(TARGET): signature check 
 
 privatekey:
 	@openssl genrsa -out key/privatekey 2048 #> /dev/null 2>&1
