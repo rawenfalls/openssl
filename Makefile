@@ -40,3 +40,5 @@ merge:
 	@./merge_files.sh -q signature/readme.signature a.ima
 ima:
 	@echo "a.ima" > a.ima
+ima2:
+	@echo echo -n "" > b.ima

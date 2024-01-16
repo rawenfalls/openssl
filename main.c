@@ -66,14 +66,16 @@ int main() {
     const char *message = "for_check/readme.txt";//к файлу
     const char *signature = "signature/readme.signature";//путь к подписи
     const char *public_key_path = "key/publickey";//путь к публичному ключу
+    const char *ima_path = "a.ima";
+    const char *signature_path = "signature/signature";
 
-    char *message_s = read_from_file(message);//чтение из файла
-    char *signature_s = read_from_file(signature);//чтение из файла
-    if (message_s == "" || signature_s == "") return 1;
+    char *messageS = read_from_file(message);//чтение из файла
+    char *signatureS = read_from_file(signature);//чтение из файла
+    if (messageS == "" || signatureS == "") return 1;
 
-    int result = verify_signature(message_s, signature_s, public_key_path);
-    free(message_s);
-    free(signature_s);
+    int result = verify_signature(messageS, signatureS, public_key_path);
+    free(messageS);
+    free(signatureS);
 
     if (result == 1) {
         printf("Signature is valid!\n");
