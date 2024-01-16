@@ -77,7 +77,7 @@ void read_and_edit_file(const char *source_path, long delete_len, const char *si
 }
 
 int main() {
-    char sys_string[512];  // Буфер для строки
+    char sys_string[1024];  // Буфер для строки
     const char *public_key_path = "key/publickey";//путь к публичному ключу
     const char *ima_path = "ts3000.ima";//путь к *.ima файлу
     const char *signature_path = "signature/signature";//путь к подписи

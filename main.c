@@ -174,8 +174,9 @@ int main() {
     //     write(1,&signatureS[i],1);
     // }
     //printf("%zu\n",signature_len);
-    //файл для проверки messageS, подпись signatureS, путь до публичного ключа
     //printf("%zu",ima_len);
+    
+    //проверка подписи (необходим : файл *.ima, его длинна, продпись, длинна подписии, путь к открытому ключу 
     int result = verify_signature(imaS, (unsigned int)ima_len, signatureS, (unsigned int)signature_len, public_key_path);
 
     //освобождаем память которая выделялась в функции read_from_file()
