@@ -12,7 +12,7 @@ ifeq ($(findstring $(TARGET),$(MAKECMDGOALS)), $(TARGET))
 endif
 
 all:
-	@$(CC) $(FILES) $(FLAGS) $(RENAME) && $(START)
+	@$(CC) $(FILES) $(FLAGS) $(RENAME) #&& $(START)
 	$(info DONE)
 clean:
 	@rm -rf $(NAME)
@@ -39,6 +39,6 @@ check:
 merge:
 	@./merge_files.sh -q signature/readme.signature a.ima
 ima:
-	@echo "a.ima" > a.ima
+	@echo "a.ima" > a.ima && ./merge_files.sh -q signature/readme.signature a.ima
 ima2:
 	@echo echo -n "" > b.ima
