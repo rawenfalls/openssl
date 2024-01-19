@@ -1,0 +1,26 @@
+В lib/flash/flashlib.cpp добавленны функции:
+static int verify_signature(const char *name) - проверяет подпись
+static int read_and_edit_file(const char *source_path, long delete_len,\
+ const char *signature_path) - вырезает подпись из файла
+Изменены функции:
+int verify_image(const char *name) - добавлен вызов verify_signature()
+
+Добаленна папка:
+signature/
+Добавлен файл:
+signature/sign.sh - скрипт который формирует подпись, подписывает файл *.ima,\
+ создает подпись signature/signature, создает папки /out/*/rootfs/key, /out/*/rootfs/signature,\
+ добавляет в папку /out/*/rootfs/key файл publickey.
+ Если скрипт не найдет publickey предложит ввести команду для его создания.
+ Файл signature/signature удаляется в случае успешного завершения скрипта.
+
+sign.sh
+Использование:./sign.sh флаг[-q|--quiet](тихий режим) путь к файлу_назначения(обычно *.ima)
+Пример использования: ./sign.sh -q ./out/ts3000/ts3000.ima
+Вывод: Verified OK - произойдет в любом случае, подпись была проверенна перед записью в файл
+
+Добаленна папка:
+key/
+Добавлены файлы:
+key/privatekey - приватный ключ, необходим для создания подписи
+key/publickey - публичный ключ, необходим для проверки подписи
